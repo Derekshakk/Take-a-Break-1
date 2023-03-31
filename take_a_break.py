@@ -4,9 +4,14 @@ from tkinter import *
 from tkinter.ttk import *
 import time
 import math
+import tkinter
+from PIL import ImageTk, Image
+
+#Installing anaconda:
+#https://learnopencv.com/install-opencv-on-windows/
 
 class Application:
-  def __init__(self, faceTimeAllowed = 1200, restTime = 900, faceDectectionReset = 60):
+  def __init__(self, faceTimeAllowed, restTime, faceDetectionReset):
     '''
       All vars are in seconds
 
@@ -23,11 +28,19 @@ class Application:
 
     # Set up main App window
     self.root = Tk()
+    self.root.geometry("500x500")
+    frame = Frame(self.root, width=350, height=350)
+    frame.pack()
+    frame.place(anchor='center', relx=0.5, rely=0.5)
+    img = ImageTk.PhotoImage(Image.open("Rest_Eyes.jpg"))
+    label = Label(frame, image = img)
+    label.pack()
+
     self.root.title("FaceTimeTracker")
     self.root.protocol('WM_DELETE_WINDOW', self.destructor)
 
     # Set up variables
-    self.faceDetectedTimeResetThreshold = faceDectectionReset # in seconds
+    self.faceDetectedTimeResetThreshold = faceDetectionReset # in seconds
     self.faceDetectedMaxTime = faceTimeAllowed # in seconds
     self.breakWindowTime = restTime
 
@@ -40,6 +53,7 @@ class Application:
     self.breakWindow = None
 
     # Start Video Loop
+    #self.root.destroy()
     self.video_loop()
 
 
@@ -130,7 +144,7 @@ class BreakWindow:
     self.root = self.app.root
 
     # pop up window set up
-    self.window = Toplevel(self.root)
+    self.window = (self.root)
     self.window.title("Take A Break")
     self.window.protocol('WM_DELETE_WINDOW', self.destructor)
 
@@ -138,7 +152,14 @@ class BreakWindow:
     self.duration = duration
     self.timeLapse = 0
     self.startTime = time.perf_counter()
-
+    '''
+    self.window.minsize(width = 200, height = 250)
+    canvas = Canvas(self.window, width = 200, height = 200)
+    canvas.pack()
+    img = tkinter.PhotoImage(file = './Rest_Eyes.jpg')
+    canvas.image = img
+    canvas.create_image(100, 100, image = img)
+    '''
     self.build() # build window 
     self.timerLoop() # window update loop
 
@@ -237,6 +258,15 @@ class BreakWindow:
 
 
 if __name__ == '__main__':
-  app = Application(faceTimeAllowed = 1200, restTime = 900, faceDectectionReset = 60)
+  faceTimeAllowed = int(input("Enter how many seconds your face has to be shown:"))
+  restTime = int(input("Enter how many seconds your rest time should be:"))
+  faceDetectionReset = int(input("Enter how many seconds the app doesn't see a face before resetting the clock:"))
+  app = Application(faceTimeAllowed, restTime, faceDetectionReset)
   app.root.iconify() # minimized main window
+  frame = Frame(app.root, width = 350, height = 350)
+  frame.pack()
+  frame.place(anchor='center', relx=0.5, rely=0.5)
+  img = ImageTk.PhotoImage(Image.open("Rest_Eyes.jpg"))
+  label = Label(frame, image = img)
+  label.pack()
   app.root.mainloop()
